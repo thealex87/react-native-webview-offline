@@ -1,38 +1,61 @@
-import React from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
-import { WebView, WebViewProps } from "react-native-webview";
-
-const uri =
-  "https://appdev.forsign.digital/operation/ok1Oyb941TU1gV7OZiZu0Yu51MdyN@pc8Jj*qJAmCBPo2PXhap/2023-03-07T18:44:09.4840929+00:00";
+import React, { useState } from "react";
+import {
+  Button,
+  GestureResponderEvent,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { WebView } from "react-native-webview";
+import TextField from "./components/TextField";
 
 export default function App() {
-  const context: WebViewProps = {
-    cacheEnabled: true,
-    cacheMode: "LOAD_CACHE_ELSE_NETWORK",
-    source: {
-      uri,
-    },
+  const [uri, setUri] = useState<string>("");
+  const [tempUri, setTempUri] = useState<string>("");
+
+  const handleOnChangeText = (text: string) => setTempUri(text);
+
+  const handleOnSubmit = (e: GestureResponderEvent) => {
+    const newUri = tempUri;
+    setUri(newUri);
+    setTempUri("");
   };
 
-  context.onLoad = (e) => {
-    console.log("loaded");
-  };
-
-  context.onError = (e) => {
-    console.log("onError");
-  };
-  context.onHttpError = (e) => {
-    console.log("onHttpError");
-  };
+  if (!uri.length) {
+    return (
+      <View style={styles.formContainer}>
+        <TextField
+          onChangeText={handleOnChangeText}
+          label={"Operação"}
+          placeholder={"Digite a URL da operação"}
+        />
+        <Button
+          disabled={!tempUri.length}
+          onPress={handleOnSubmit}
+          title="Continuar"
+        />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <WebView {...context} />
+      <WebView
+        cacheEnabled
+        cacheMode="LOAD_CACHE_ELSE_NETWORK"
+        source={{ uri }}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  formContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "grey",
+  },
   container: {
     flex: 1,
     marginTop: 30,
